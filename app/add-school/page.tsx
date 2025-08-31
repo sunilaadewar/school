@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { z } from "zod";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,6 +16,8 @@ import {
 	Form,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { Loader2Icon } from "lucide-react";
 
 const formSchema = z.object({
 	name: z.string().min(2, {
@@ -33,15 +35,18 @@ const formSchema = z.object({
 	contact: z.string().min(2, {
 		message: "Contact must be at least 2 characters.",
 	}),
-	image: z.string().min(2, {
-		message: "image must be at least 2 characters.",
-	}),
+	image: z
+		.string()
+		.url({ message: "Please enter a valid image URL" })
+		.min(2, { message: "Image URL must be at least 2 characters long" }),
 	email: z.string().min(2, {
 		message: "email must be at least 2 characters.",
 	}),
 });
 
 const Page = () => {
+	const [loading, setLoading] = useState(false);
+
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -55,8 +60,27 @@ const Page = () => {
 		},
 	});
 
-	function onSubmit(values: z.infer<typeof formSchema>) {
-		console.log(values);
+	async function onSubmit(values: z.infer<typeof formSchema>) {
+		setLoading(true);
+		try {
+			const res = await fetch("/api/addSchool", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(values),
+			});
+
+			// const data = await res.json();
+
+			if (!res.ok) {
+				toast.error("Error while creating school");
+			}
+			toast.success("School created succesfully");
+		} catch (err) {
+			toast.error("Error while creating school");
+		} finally {
+			setLoading(false);
+			form.reset();
+		}
 	}
 
 	return (
@@ -185,7 +209,7 @@ const Page = () => {
 									<Input
 										className="p-6"
 										type="text"
-										placeholder="Image"
+										placeholder="Enter Image URL"
 										{...field}
 									/>
 								</FormControl>
@@ -200,9 +224,13 @@ const Page = () => {
 					<div className="lg:col-span-2 flex flex-col lg:flex-row justify-start">
 						<Button
 							type="submit"
-							className="w-full lg:w-auto"
+							className="w-full lg:w-fit"
+							disabled={loading}
 						>
-							Submit
+							<span className="flex flex-row gap-2">
+								{loading && <Loader2Icon className="animate-spin" />}
+								{loading ? "Wait..." : "Submit"}
+							</span>
 						</Button>
 					</div>
 				</form>
