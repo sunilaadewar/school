@@ -32,7 +32,7 @@ const formSchema = z.object({
 	state: z.string().min(2, {
 		message: "state must be at least 2 characters.",
 	}),
-	contact: z.string().min(2, {
+	contact: z.string().min(10, {
 		message: "Contact must be at least 2 characters.",
 	}),
 	image: z

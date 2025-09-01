@@ -22,6 +22,7 @@ import {
 	PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
+import { ImageWithFallback } from "@/components/ImageWithFallback";
 
 const schools = [
 	{
@@ -139,10 +140,17 @@ const Page = () => {
 									<div className="relative w-full h-48 sm:h-56 md:h-64 lg:h-80">
 										<Image
 											className="rounded-t-xl object-cover"
-											src={
-												item.image ||
-												"https://avatars.githubusercontent.com/u/124599?v=4"
-											}
+											src={item.image}
+											alt={item.name}
+											fill
+											sizes="(max-width: 640px) 100vw, 
+                       (max-width: 1024px) 50vw, 
+                       33vw"
+										/>
+										{/*  */}
+										<ImageWithFallback
+											className="rounded-t-xl object-cover"
+											src={item.image}
 											alt={item.name}
 											fill
 											sizes="(max-width: 640px) 100vw, 
